@@ -1,12 +1,9 @@
 from colorama import init
 import click
-import util
-import workspace as workspace_service
-import storage as storage_service
-import fileshare as fileshare_service
-import blob_storage as blob_storage_service
-import resource_group as rg_service
-import cluster as cluster_service
+from . import resource_group, workspace
+from . import storage, blob_storage, fileshare
+from . import cluster, job
+from . import logging
 import azure.mgmt.batchai as training
 from azure.common.credentials import ServicePrincipalCredentials
 from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
@@ -82,18 +79,6 @@ def create_cluster(context, cluster_name, node_count, vm_size, admin_username,
                    admin_password, admin_ssh_public_key, workspace,
                    storage_account_name, fileshare_name):
     """Set up a batch ai cluster."""
-    util.set_properties(context.obj,
-                        cluster_name=cluster_name,
-                        node_count=node_count,
-                        vm_size=vm_size,
-                        admin_username=admin_username,
-                        admin_password=admin_password,
-                        admin_ssh_public_key=admin_ssh_public_key,
-                        workspace=workspace,
-                        storage_account_name=storage_account_name,
-                        fileshare_name=fileshare_name)
-    #TODO: remove this copypasta and put into a function
-    '''
     context.obj['cluster_name'] = cluster_name
     context.obj['node_count'] = node_count
     context.obj['vm_size'] = vm_size
@@ -103,7 +88,6 @@ def create_cluster(context, cluster_name, node_count, vm_size, admin_username,
     context.obj['workspace'] = workspace
     context.obj['storage_account_name'] = storage_account_name
     context.obj['fileshare_name'] = fileshare_name
-    '''
 
     create_batchai_client(context)
     workspace_exists = workspace_service.create_workspace_if_not_exists(context)
@@ -176,13 +160,7 @@ def create_fileshare_directory(context):
     fileshare_service.set_fileshare_service(context)
     fileshare_service.create_directory_if_not_exists(context)
 
-@storage.group()
-@click.option('--fileshare-name', required=True)
-@click.pass_context
-def fileshare(context, fileshare_name):
-    """Fileshare."""
-    context.obj['fileshare_name'] = fileshare_name
-
+'''
 @storage.group()
 @click.option('--fileshare-name', required=True)
 @click.pass_context
@@ -198,6 +176,7 @@ def create_blob_storage(context):
     if not valid_storage_acct:
         return
     pass #  TODO: add func
+'''
 
 main.add_command(cluster)
 main.add_command(storage)
