@@ -34,7 +34,8 @@ def cluster(context: object) -> None:
 @click.option('--workspace', required=True)
 @click.option('--storage-account-name', required=True)
 @click.option('--fileshare-name', required=True)
-def create_cluster(context: object, cluster_name: str, node_count: int, vm_size: str, admin_username: str, admin_password: str, admin_ssh_public_key: str, workspace: str, storage_account_name: str, fileshare_name: str) -> None:
+def create_cluster(context: object, cluster_name: str, node_count: int,
+    vm_size: str, admin_username: str, admin_password: str, admin_ssh_public_key: str, workspace: str, storage_account_name: str, fileshare_name: str) -> None:
     """Set up a batch ai cluster."""
     context.obj['cluster_name'] = cluster_name
     context.obj['node_count'] = node_count
@@ -143,7 +144,8 @@ def create_blob_storage(context: object) -> None:
 @click.option('--aad-secret-key', required=True)
 @click.option('--aad-tenant-id', required=True)
 @click.pass_context
-def main(context: object, subscription_id: str, resource_group_name: str, location: str, aad_client_id: str, aad_secret_key:str, aad_tenant_id: str) -> None:
+def main(context: object, subscription_id: str, resource_group_name: str,
+    location: str, aad_client_id: str, aad_secret_key:str, aad_tenant_id: str) -> None:
     """A Python tool for Batch AI.
 
     At minimum you must have:
