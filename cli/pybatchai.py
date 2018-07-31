@@ -35,7 +35,8 @@ def cluster(context: object) -> None:
 @click.option('--storage-account-name', required=True)
 @click.option('--fileshare-name', required=True)
 def create_cluster(context: object, cluster_name: str, node_count: int,
-    vm_size: str, admin_username: str, admin_password: str, admin_ssh_public_key: str, workspace: str, storage_account_name: str,
+    vm_size: str, admin_username: str, admin_password: str, 
+    admin_ssh_public_key: str, workspace: str, storage_account_name: str,
     fileshare_name: str) -> None:
     """Set up a batch ai cluster."""
     context.obj['cluster_name'] = cluster_name
