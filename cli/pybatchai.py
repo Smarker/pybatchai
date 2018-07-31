@@ -1,21 +1,55 @@
 from colorama import init
 import click
-from . import resource_group, workspace
-from . import storage, blob_storage, fileshare
-from . import cluster, job
-from . import logging
+import logging
+import resource_group, workspace
+import storage, blob_storage, fileshare
+import cluster, job
 import azure.mgmt.batchai as training
 from azure.common.credentials import ServicePrincipalCredentials
 from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
 
-def create_batchai_client(context: object) -> None:
-    """Client to create batchai resources."""
-    if 'batchai_client' not in context.obj:
-        batchai_client = training.BatchAIManagementClient(
-            credentials=context.obj['aad_credentials'],
-            subscription_id=context.obj['subscription_id'],
-            base_url=AZURE_PUBLIC_CLOUD.endpoints.resource_manager)
-        context.obj['batchai_client'] = batchai_client
+@click.group()
+@click.option('--subscription-id', required=True)
+@click.option('--resource-group-name', required=True)
+@click.option('--location', required=True)
+@click.option('--aad-client-id', required=True)
+@click.option('--aad-secret-key', required=True)
+@click.option('--aad-tenant-id', required=True)
+@click.pass_context
+def main(context: object, subscription_id: str, resource_group_name: str,
+    location: str, aad_client_id: str, aad_secret_key:str, aad_tenant_id: str) -> None:
+    """A Python tool for Batch AI.
+
+    At minimum you must have:
+
+    1. An Azure Subscription with an Owner or User Access Administrator role to
+    assign a role to an Azure Active Directory (AAD) App
+
+    2. An AAD application created to obtain an aad client id, aad secret key,
+     aad tenant id. The AAD app must have a contributor role.
+
+    For 1 see:
+    https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal
+
+    For 2 see:
+    https://github.com/Azure/BatchAI/blob/master/recipes/Preparation.md#using-portal
+    """
+    init(autoreset=True)
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(level=logging.DEBUG)
+
+    aad_token_uri = 'https://login.microsoftonline.com/{0}/oauth2/token'.format(aad_tenant_id)
+    credentials = ServicePrincipalCredentials(client_id=aad_client_id,
+                                              secret=aad_secret_key,
+                                              token_uri=aad_token_uri)
+    context.obj = {
+        'subscription_id': subscription_id,
+        'resource_group': resource_group_name,
+        'location': location,
+        'aad_credentials': credentials
+    }
+
+    rg_service.create_resource_group_if_not_exists(context)
 
 @main.group()
 @click.pass_context
@@ -55,6 +89,15 @@ def create_cluster(context: object, cluster_name: str, node_count: int,
         return
 
     cluster_service.create_cluster(context)
+
+def create_batchai_client(context: object) -> None:
+    """Client to create batchai resources."""
+    if 'batchai_client' not in context.obj:
+        batchai_client = training.BatchAIManagementClient(
+            credentials=context.obj['aad_credentials'],
+            subscription_id=context.obj['subscription_id'],
+            base_url=AZURE_PUBLIC_CLOUD.endpoints.resource_manager)
+        context.obj['batchai_client'] = batchai_client
 
 @cluster.command(name='monitor')
 @click.pass_context
@@ -137,48 +180,6 @@ def create_blob_storage(context: object) -> None:
         return
     pass #  TODO: add func
 '''
-
-@click.group()
-@click.option('--subscription-id', required=True)
-@click.option('--resource-group-name', required=True)
-@click.option('--location', required=True)
-@click.option('--aad-client-id', required=True)
-@click.option('--aad-secret-key', required=True)
-@click.option('--aad-tenant-id', required=True)
-@click.pass_context
-def main(context: object, subscription_id: str, resource_group_name: str,
-    location: str, aad_client_id: str, aad_secret_key:str, aad_tenant_id: str) -> None:
-    """A Python tool for Batch AI.
-
-    At minimum you must have:
-
-    1. An Azure Subscription with an Owner or User Access Administrator role to
-    assign a role to an Azure Active Directory (AAD) App
-
-    2. An AAD application created to obtain an aad client id, aad secret key,
-     aad tenant id. The AAD app must have a contributor role.
-
-    For 1 see:
-    https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal
-
-    For 2 see:
-    https://github.com/Azure/BatchAI/blob/master/recipes/Preparation.md#using-portal
-    """
-    init(autoreset=True)
-
-    aad_token_uri = 'https://login.microsoftonline.com/{0}/oauth2/token'.format(aad_tenant_id)
-    credentials = ServicePrincipalCredentials(client_id=aad_client_id,
-                                              secret=aad_secret_key,
-                                              token_uri=aad_token_uri)
-    context.obj = {
-        'subscription_id': subscription_id,
-        'resource_group': resource_group_name,
-        'location': location,
-        'aad_credentials': credentials
-    }
-
-    rg_service.create_resource_group_if_not_exists(context)
-
 
 main.add_command(cluster)
 main.add_command(storage)

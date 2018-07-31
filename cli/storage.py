@@ -1,4 +1,5 @@
 import notify
+import logging
 from azure.mgmt.storage.models import (
     StorageAccountCreateParameters,
     Sku,
@@ -6,6 +7,8 @@ from azure.mgmt.storage.models import (
     Kind
 )
 from azure.mgmt.storage import StorageManagementClient
+
+storage_logger = logging.getLogger(__name__)
 
 def set_storage_client(context):
     if 'storage_client' not in context.obj:
