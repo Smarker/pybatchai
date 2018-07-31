@@ -1,1 +1,3 @@
-pip3 install -e .
+#!/usr/bin/env bash
+pip3 install -e . --user
+

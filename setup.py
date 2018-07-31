@@ -3,18 +3,17 @@ from setuptools import setup
 setup(
     name="pybatchai",
     version='0.1',
-    py_modules=['hello'],
     install_requires=[
-        'Click',
         'azure',
+        'azure-mgmt >= 2.0.0',
+        'azure-mgmt-batchai ~= 0.2.0',
         'azure-storage-blob',
         'azure-storage-file',
-        'coloredlogs',
-        'logging',
-        'azure-mgmt-batchai >= 2.0.0',
-        'python_version >= 3.6'
+        'Click',
+        'colorama',
+        'testresources',
     ],
-    entry_points='''
-        easycluster=easycluster:cli
-    '''
+    entry_points={
+        'console_scripts': ['pybatchai=pybatchai:cli']
+    }
 )
