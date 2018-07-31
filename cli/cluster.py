@@ -1,5 +1,6 @@
-import notify
 import azure.mgmt.batchai.models as models
+
+import cli.notify
 
 def create_cluster(context):
     """Create a batchai cluster."""
@@ -24,7 +25,7 @@ def create_cluster(context):
         ).result()
         print(cluster_status)
     except Exception:
-        notify.print_create_failed(context.obj['cluster_name'], Exception)
+        cli.notify.print_create_failed(context.obj['cluster_name'], Exception)
 
 def monitor_cluster(context):
     """Monitor the status of your batchai cluster."""

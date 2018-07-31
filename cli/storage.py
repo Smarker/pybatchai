@@ -1,14 +1,16 @@
-import notify
-import logging
+import time
+
+from azure.mgmt.storage import StorageManagementClient
 from azure.mgmt.storage.models import (
     StorageAccountCreateParameters,
     Sku,
     SkuName,
     Kind
 )
-from azure.mgmt.storage import StorageManagementClient
 
-storage_logger = logging.getLogger(__name__)
+import cli.notify
+
+ONE_SECOND = 1
 
 def set_storage_client(context):
     if 'storage_client' not in context.obj:
@@ -17,21 +19,27 @@ def set_storage_client(context):
             subscription_id=context.obj['subscription_id'])
 
 def set_storage_account_key(context):
-    storage_keys = context.obj['storage_client'].storage_accounts.list_keys(context.obj['resource_group'], context.obj['storage_account_name'])
+    storage_keys = context.obj['storage_client'].storage_accounts.list_keys(
+        context.obj['resource_group'],
+        context.obj['storage_account_name'])
     storage_keys = {v.key_name: v.value for v in storage_keys.keys}
     storage_account_key = storage_keys['key1']
     context.obj['storage_account_key'] = storage_account_key
 
 def create_storage_acct_if_not_exists(context):
-    availability = context.obj['storage_client'].storage_accounts.check_name_availability(context.obj['storage_account_name'])
+    storage_client = context.obj['storage_client']
+    availability = storage_client.storage_accounts.check_name_availability(
+        context.obj['storage_account_name'])
     if not availability.name_available:
         if availability.reason.value == 'AlreadyExists':
-            notify.print_already_exists('storage account')
+            cli.notify.print_already_exists('storage account')
+            set_storage_account_key(context)
         else:
-            notify.print_create_failed('storage account', availability.message)
+            cli.notify.print_create_failed('storage account',
+                                           availability.message)
             return False
     else:
-        context.obj['storage_client'].storage_accounts.create(
+        storage_client.storage_accounts.create(
             context.obj['resource_group'],
             context.obj['storage_account_name'],
             StorageAccountCreateParameters(
@@ -40,10 +48,19 @@ def create_storage_acct_if_not_exists(context):
                 location=context.obj['location']
             )
         )
-        notify.print_created(context.obj['storage_account_name'])
+        cli.notify.print_created(context.obj['storage_account_name'])
 
-    storage_keys = context.obj['storage_client'].storage_accounts.list_keys(context.obj['resource_group'], context.obj['storage_account_name'])
-    storage_keys = {v.key_name: v.value for v in storage_keys.keys}
-    storage_account_key = storage_keys['key1']
-    context.obj['storage_account_key'] = storage_account_key
+        # wait for storage account to be provisioning state 'Succeeded'
+        print('Storage account is being allocated...')
+        provisioning_state = get_storage_account_provisioning_state(context)
+        while provisioning_state != 'Succeeded':
+            time.sleep(ONE_SECOND)
+            print('Waiting on storage account allocation...')
+            provisioning_state = get_storage_account_provisioning_state(context)
+        set_storage_account_key(context)
     return True
+
+def get_storage_account_provisioning_state(context):
+    return context.obj['storage_client'].storage_accounts.get_properties(
+        context.obj['resource_group'],
+        context.obj['storage_account_name']).provisioning_state.value

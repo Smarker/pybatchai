@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(
-    name="easycluster",
+    name="pybatchai",
     version='0.1',
     py_modules=['hello'],
     install_requires=[
@@ -9,7 +9,8 @@ setup(
         'azure',
         'azure-storage-blob',
         'azure-storage-file',
-        'colorama',
+        'coloredlogs',
+        'logging',
         'azure-mgmt-batchai >= 2.0.0',
         'python_version >= 3.6'
     ],

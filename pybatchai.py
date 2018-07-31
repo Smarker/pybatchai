@@ -1,12 +1,17 @@
-from colorama import init
-import click
-import logging
-import resource_group, workspace
-import storage, blob_storage, fileshare
-import cluster, job
 import azure.mgmt.batchai as training
 from azure.common.credentials import ServicePrincipalCredentials
+import click
+import coloredlogs
+import logging
 from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
+
+import cli.blob_storage
+import cli.cluster
+import cli.fileshare
+import cli.job
+import cli.resource_group
+import cli.storage
+import cli.workspace
 
 @click.group()
 @click.option('--subscription-id', required=True)
@@ -17,7 +22,8 @@ from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
 @click.option('--aad-tenant-id', required=True)
 @click.pass_context
 def main(context: object, subscription_id: str, resource_group_name: str,
-    location: str, aad_client_id: str, aad_secret_key:str, aad_tenant_id: str) -> None:
+    location: str, aad_client_id: str, aad_secret_key:str,
+    aad_tenant_id: str) -> None:
     """A Python tool for Batch AI.
 
     At minimum you must have:
@@ -34,9 +40,6 @@ def main(context: object, subscription_id: str, resource_group_name: str,
     For 2 see:
     https://github.com/Azure/BatchAI/blob/master/recipes/Preparation.md#using-portal
     """
-    init(autoreset=True)
-    logger = logging.getLogger(__name__)
-    logging.basicConfig(level=logging.DEBUG)
 
     aad_token_uri = 'https://login.microsoftonline.com/{0}/oauth2/token'.format(aad_tenant_id)
     credentials = ServicePrincipalCredentials(client_id=aad_client_id,
@@ -49,7 +52,7 @@ def main(context: object, subscription_id: str, resource_group_name: str,
         'aad_credentials': credentials
     }
 
-    rg_service.create_resource_group_if_not_exists(context)
+    cli.resource_group.create_resource_group_if_not_exists(context)
 
 @main.group()
 @click.pass_context
@@ -84,11 +87,11 @@ def create_cluster(context: object, cluster_name: str, node_count: int,
     context.obj['fileshare_name'] = fileshare_name
 
     create_batchai_client(context)
-    workspace_exists = workspace_service.create_workspace_if_not_exists(context)
+    workspace_exists = cli.workspace.create_workspace_if_not_exists(context)
     if not workspace_exists:
         return
 
-    cluster_service.create_cluster(context)
+    cli.cluster.create_cluster(context)
 
 def create_batchai_client(context: object) -> None:
     """Client to create batchai resources."""
@@ -108,7 +111,7 @@ def monitor_cluster(context: object, cluster_name: str, workspace: str) -> None:
     context.obj['cluster_name'] = cluster_name
     context.obj['workspace'] = workspace
     create_batchai_client(context)
-    cluster_service.monitor_cluster(context)
+    cli.cluster.monitor_cluster(context)
 
 @main.group()
 @click.pass_context
@@ -129,8 +132,11 @@ def job_create(context: object) -> None:
 def storage(context: object, storage_account_name: str) -> None:
     """Storage options."""
     context.obj['storage_account_name'] = storage_account_name
-    storage_service.set_storage_client(context)
-    storage_service.set_storage_account_key(context)
+    cli.storage.set_storage_client(context)
+    valid_storage_acct = cli.storage.create_storage_acct_if_not_exists(context)
+    if not valid_storage_acct:
+        return
+    cli.storage.set_storage_account_key(context)
 
 @storage.group()
 @click.option('--fileshare-name', required=True)
@@ -143,11 +149,8 @@ def fileshare(context: object, fileshare_name: str) -> None:
 @click.pass_context
 def create_fileshare(context: object) -> None:
     """Create an Azure File Share."""
-    valid_storage_acct = storage_service.create_storage_acct_if_not_exists(context)
-    if not valid_storage_acct:
-        return
-    fileshare_service.set_fileshare_service(context)
-    fileshare_service.create_file_share_if_not_exists(context)
+    cli.fileshare.set_fileshare_service(context)
+    cli.fileshare.create_file_share_if_not_exists(context)
 
 @fileshare.group()
 @click.option('--directory-name', required=True)
@@ -160,26 +163,8 @@ def directory(context: object, directory_name: str) -> None:
 @click.pass_context
 def create_fileshare_directory(context: object) -> None:
     """Create an Azure File Share Directory."""
-    fileshare_service.set_fileshare_service(context)
-    fileshare_service.create_directory_if_not_exists(context)
-
-'''
-@storage.group()
-@click.option('--fileshare-name', required=True)
-@click.pass_context
-def blob_storage(context: object, fileshare_name: str) -> None:
-    """Blob Storage."""
-    blob_storage_service.set_blob_storage_service()
-
-@blobstorage.command(name='create')
-@click.pass_context
-def create_blob_storage(context: object) -> None:
-    """Create an Azure Blob Storage."""
-    valid_storage_acct = storage_service.create_storage_acct_if_not_exists(context)
-    if not valid_storage_acct:
-        return
-    pass #  TODO: add func
-'''
+    cli.fileshare.set_fileshare_service(context)
+    cli.fileshare.create_directory_if_not_exists(context)
 
 main.add_command(cluster)
 main.add_command(storage)

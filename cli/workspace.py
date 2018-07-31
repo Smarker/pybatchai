@@ -1,4 +1,4 @@
-import notify
+import cli.notify
 
 def created_workspace(context):
     all_workspaces = list(context.obj['batchai_client'].workspaces.list())
@@ -9,10 +9,10 @@ def create_workspace_if_not_exists(context):
     if not created_workspace(context):
         try:
             context.obj['batchai_client'].workspaces.create(context.obj['resource_group'], workspace_name, context.obj['location'])
-            notify.print_created(workspace_name)
+            cli.notify.print_created(workspace_name)
         except Exception as e:
-            notify.print_create_failed(workspace_name, e)
+            cli.notify.print_create_failed(workspace_name, e)
             return False
     else:
-        notify.print_already_exists(workspace_name)
+        cli.notify.print_already_exists(workspace_name)
     return True
