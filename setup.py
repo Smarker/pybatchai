@@ -7,9 +7,9 @@ setup(
         'azure',
         'azure-mgmt >= 2.0.0',
         'azure-mgmt-batchai ~= 0.2.0',
-        'azure-storage-blob',
+        'azure-storage-blob ~= 1.3.0',
         'azure-storage-file',
-        'blobxfer'
+        'blobxfer',
         'Click',
         'colorama',
         'testresources',
