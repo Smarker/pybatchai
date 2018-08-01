@@ -14,7 +14,7 @@ SKIP_ON_OPTIONS = blobxfer.api.SkipOnOptions(
     lmt_ge=None,
     md5_match=None
 )
-def start_uploader(context, mode):
+def start_uploader(context, mode, remote_path):
     concurrency = create_concurrency_options(action=UPLOAD)
     general_options = create_general_options(concurrency, TIMEOUT)
     upload_options = create_upload_options(storage_mode=mode)
@@ -30,7 +30,7 @@ def start_uploader(context, mode):
 
     azure_dest_path = blobxfer.api.AzureDestinationPath()
     azure_dest_path.add_path_with_storage_account(
-        remote_path=context.obj['container_name'],
+        remote_path=remote_path,
         storage_account=context.obj['storage_account_name']
     )
     specification.add_azure_destination_path(azure_dest_path)
@@ -41,7 +41,7 @@ def start_uploader(context, mode):
         specification
     ).start()
 
-def start_downloader(context, mode):
+def start_downloader(context, mode, remote_path):
     concurrency = create_concurrency_options(action=DOWNLOAD)
     general_options = create_general_options(concurrency, TIMEOUT)
     download_options = create_download_options(storage_mode=mode)
@@ -57,7 +57,7 @@ def start_downloader(context, mode):
 
     azure_src_path = blobxfer.api.AzureSourcePath()
     azure_src_path.add_path_with_storage_account(
-        remote_path=context.obj['container_name'],
+        remote_path=remote_path,
         storage_account=context.obj['storage_account_name']
     )
     specification.add_azure_source_path(azure_src_path)

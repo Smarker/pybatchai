@@ -22,25 +22,12 @@ def create_file_share_if_not_exists(context):
     else:
         cli.notify.print_already_exists(fileshare_name)
 
-def created_directory(context):
-    dirs_and_files = context.obj['fileshare_service'].list_directories_and_files(
-        context.obj['fileshare_name'])
-    return any(context.obj['fileshare_directory'] == dir_or_file.name
-               for dir_or_file in dirs_and_files)
-
-def create_directory_if_not_exists(context):
-    fileshare_directory = context.obj['fileshare_directory']
-    if not created_directory(context):
-        context.obj['fileshare_service'].create_directory(
-            context.obj['fileshare_name'],
-            fileshare_directory,
-            fail_on_exist=False)
-        cli.notify.print_created(fileshare_directory)
-    else:
-        cli.notify.print_already_exists(fileshare_directory)
-
 def upload(context):
-    cli.blobxfer_util.start_uploader(context, azmodels.StorageModes.File)
+    cli.blobxfer_util.start_uploader(context,
+                                     azmodels.StorageModes.File,
+                                     context.obj['fileshare_name'])
 
 def download(context):
-    cli.blobxfer_util.start_downloader(context, azmodels.StorageModes.File)
+    cli.blobxfer_util.start_downloader(context,
+                                       azmodels.StorageModes.File,
+                                       context.obj['fileshare_name'])

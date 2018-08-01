@@ -21,8 +21,12 @@ def set_container_public_access(context):
         context.obj['container_name'], public_access=PublicAccess.Container)
 
 def upload(context):
-    cli.blobxfer_util.start_downloader(context, azmodels.StorageModes.Block)
+    cli.blobxfer_util.start_downloader(context,
+                                       azmodels.StorageModes.Block,
+                                       context.obj['container_name'])
     set_container_public_access(context)
 
 def download(context):
-    cli.blobxfer_util.start_downloader(context, azmodels.StorageModes.Block)
+    cli.blobxfer_util.start_downloader(context,
+                                       azmodels.StorageModes.Block,
+                                       context.obj['container_name'])

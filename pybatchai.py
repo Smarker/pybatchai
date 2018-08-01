@@ -137,57 +137,35 @@ def storage(context: object, storage_account_name: str) -> None:
     cli.storage.set_storage_account_key(context)
 
 @storage.group()
+@click.option('--fileshare-name', required=True)
 @click.pass_context
-def fileshare(context: object) -> None:
+def fileshare(context: object, fileshare_name: str) -> None:
     """Fileshare."""
+    context.obj['fileshare_name'] = fileshare_name
     pass
 
 @fileshare.command(name='create')
-@click.option('--fileshare-name', required=True)
 @click.pass_context
-def create_fileshare(context: object, fileshare_name: str) -> None:
+def create_fileshare(context: object) -> None:
     """Create an Azure File Share."""
-    context.obj['fileshare_name'] = fileshare_name
     cli.fileshare.set_fileshare_service(context)
     cli.fileshare.create_file_share_if_not_exists(context)
 
-@fileshare.group()
-@click.option('--directory-name', required=True)
-@click.pass_context
-def directory(context: object, directory_name: str) -> None:
-    """Directory."""
-    context.obj['fileshare_directory'] = directory_name
-
-@fileshare.command(name='create')
-@click.pass_context
-def create_fileshare_directory(context: object) -> None:
-    """Create an Azure File Share Directory."""
-    cli.fileshare.set_fileshare_service(context)
-    cli.fileshare.create_directory_if_not_exists(context)
-
 @fileshare.command(name='upload')
-@click.option('--fileshare-name', required=True)
-@click.option('--fileshare-directory', required=True)
 @click.option('--data-dir', required=True)
 @click.pass_context
-def upload_to_fileshare_directory(context: object, fileshare_name: str,
-    fileshare_directory: str, data_dir: str) -> None:
+def upload_to_fileshare(context: object,
+    data_dir: str) -> None:
     """Upload directory to fileshare."""
-    context.obj['fileshare_name'] = fileshare_name
-    context.obj['fileshare_directory'] = fileshare_directory
     context.obj['data_dir'] = data_dir
     cli.fileshare.upload(context)
 
 @fileshare.command(name='download')
-@click.option('--fileshare-name', required=True)
-@click.option('--fileshare-directory', required=True)
 @click.option('--local-download-path', required=True)
 @click.pass_context
-def download_fileshare_directory(context: object, fileshare_name: str,
-    fileshare_directory: str, local_download_path: str) -> None:
+def download_fileshare(context: object,
+    local_download_path: str) -> None:
     """Download directory from fileshare."""
-    context.obj['fileshare_name'] = fileshare_name
-    context.obj['fileshare_directory'] = fileshare_directory
     context.obj['local_download_path'] = local_download_path
     cli.fileshare.download(context)
 
@@ -232,10 +210,8 @@ main.add_command(cluster)
 main.add_command(storage)
 storage.add_command(fileshare)
 fileshare.add_command(create_fileshare)
-fileshare.add_command(directory)
-directory.add_command(create_fileshare_directory)
-fileshare.add_command(upload_to_fileshare_directory)
-fileshare.add_command(download_fileshare_directory)
+fileshare.add_command(upload_to_fileshare)
+fileshare.add_command(download_fileshare)
 storage.add_command(blobstorage)
 storage.add_command(create_blob_storage_container)
 storage.add_command(upload_to_blob_container)

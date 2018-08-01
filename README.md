@@ -62,8 +62,6 @@ pybatchai
   storage
     fileshare
       create
-      directory
-        create
       download
       upload
     blobstorage
