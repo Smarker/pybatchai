@@ -10,7 +10,7 @@ install.sh
 
 ## usage
 
-Create a fileshare directory to store errors and logs from your cluster.
+Upload files to a blob storage container.
 
 ```sh
 pybatchai \
@@ -22,11 +22,10 @@ pybatchai \
 --location <location> \
 storage \
 --storage-account-name <storage acct name> \
-fileshare \
---fileshare-name <file share name> \
-directory \
---directory-name <file share directory> \
-create
+blobstorage \
+upload \
+--container-name data \
+--data-dir <path to local data directory>
 ```
 
 Create a cluster.
@@ -65,6 +64,12 @@ pybatchai
       create
       directory
         create
+      download
+      upload
+    blobstorage
+      create
+      upload
+      download
   job
     create
 ```

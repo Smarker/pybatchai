@@ -9,6 +9,7 @@ setup(
         'azure-mgmt-batchai ~= 0.2.0',
         'azure-storage-blob',
         'azure-storage-file',
+        'blobxfer'
         'Click',
         'colorama',
         'testresources',

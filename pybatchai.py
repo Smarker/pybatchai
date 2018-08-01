@@ -139,16 +139,17 @@ def storage(context: object, storage_account_name: str) -> None:
     cli.storage.set_storage_account_key(context)
 
 @storage.group()
-@click.option('--fileshare-name', required=True)
 @click.pass_context
-def fileshare(context: object, fileshare_name: str) -> None:
+def fileshare(context: object) -> None:
     """Fileshare."""
-    context.obj['fileshare_name'] = fileshare_name
+    pass
 
 @fileshare.command(name='create')
+@click.option('--fileshare-name', required=True)
 @click.pass_context
-def create_fileshare(context: object) -> None:
+def create_fileshare(context: object, fileshare_name: str) -> None:
     """Create an Azure File Share."""
+    context.obj['fileshare_name'] = fileshare_name
     cli.fileshare.set_fileshare_service(context)
     cli.fileshare.create_file_share_if_not_exists(context)
 
@@ -166,12 +167,81 @@ def create_fileshare_directory(context: object) -> None:
     cli.fileshare.set_fileshare_service(context)
     cli.fileshare.create_directory_if_not_exists(context)
 
+@fileshare.command(name='upload')
+@click.option('--fileshare-name', required=True)
+@click.option('--fileshare-directory', required=True)
+@click.option('--data-dir', required=True)
+@click.pass_context
+def upload_to_fileshare_directory(context: object, fileshare_name: str,
+    fileshare_directory: str, data_dir: str) -> None:
+    """Upload directory to fileshare."""
+    context.obj['fileshare_name'] = fileshare_name
+    context.obj['fileshare_directory'] = fileshare_directory
+    context.obj['data_dir'] = data_dir
+    cli.fileshare.upload(context)
+
+@fileshare.command(name='download')
+@click.option('--fileshare-name', required=True)
+@click.option('--fileshare-directory', required=True)
+@click.option('--local-download-path', required=True)
+@click.pass_context
+def download_fileshare_directory(context: object, fileshare_name: str,
+    fileshare_directory: str, local_download_path: str) -> None:
+    """Download directory from fileshare."""
+    context.obj['fileshare_name'] = fileshare_name
+    context.obj['fileshare_directory'] = fileshare_directory
+    context.obj['local_download_path'] = local_download_path
+    cli.fileshare.download(context)
+
+@storage.group()
+@click.pass_context
+def blobstorage(context: object) -> None:
+    """Blob Storage."""
+    cli.blob_storage.set_blob_storage_service(context)
+    pass
+
+@blobstorage.command(name='create')
+@click.option('--container-name', required=True)
+@click.pass_context
+def create_blob_storage_container(context: object, container_name: str) -> None:
+    """Create an Azure Blob Storage Container."""
+    context.obj['container_name'] = container_name
+    cli.blob_storage.create_container_if_not_exists(context)
+
+@blobstorage.command(name='upload')
+@click.option('--container-name', required=True)
+@click.option('--data-dir', required=True)
+@click.pass_context
+def upload_to_blob_container(context: object, container_name: str,
+    data_dir: str) -> None:
+    """Upload directory to blob container."""
+    context.obj['container_name'] = container_name
+    context.obj['data_dir'] = data_dir
+    cli.blob_storage.upload(context)
+
+@blobstorage.command(name='download')
+@click.option('--container-name', required=True)
+@click.option('--local-download-path', required=True)
+@click.pass_context
+def download_from_blob_container(context: object, container_name: str,
+    local_download_path: str) -> None:
+    """Download directory from blob container."""
+    context.obj['container_name'] = container_name
+    context.obj['local_download_path'] = local_download_path
+    cli.blob_storage.download(context)
+
 main.add_command(cluster)
 main.add_command(storage)
 storage.add_command(fileshare)
 fileshare.add_command(create_fileshare)
 fileshare.add_command(directory)
 directory.add_command(create_fileshare_directory)
+fileshare.add_command(upload_to_fileshare_directory)
+fileshare.add_command(download_fileshare_directory)
+storage.add_command(blobstorage)
+storage.add_command(create_blob_storage_container)
+storage.add_command(upload_to_blob_container)
+storage.add_command(download_from_blob_container)
 cluster.add_command(create_cluster)
 cluster.add_command(monitor_cluster)
 
