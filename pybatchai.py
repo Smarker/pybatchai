@@ -52,7 +52,7 @@ def main(context: object, subscription_id: str, resource_group_name: str,
         'aad_credentials': credentials
     }
 
-    cli.resource_group.create_resource_group_if_not_exists(context)
+    cli.resource_group.create_rg_if_not_exists(context)
 
 @main.group()
 @click.pass_context
@@ -87,9 +87,7 @@ def create_cluster(context: object, cluster_name: str, node_count: int,
     context.obj['fileshare_name'] = fileshare_name
 
     create_batchai_client(context)
-    workspace_exists = cli.workspace.create_workspace_if_not_exists(context)
-    if not workspace_exists:
-        return
+    cli.workspace.create_workspace_if_not_exists(context)
 
     cli.cluster.create_cluster(context)
 
@@ -133,7 +131,7 @@ def storage(context: object, storage_account_name: str) -> None:
     """Storage options."""
     context.obj['storage_account_name'] = storage_account_name
     cli.storage.set_storage_client(context)
-    valid_storage_acct = cli.storage.create_storage_acct_if_not_exists(context)
+    valid_storage_acct = cli.storage.create_acct_if_not_exists(context)
     if not valid_storage_acct:
         return
     cli.storage.set_storage_account_key(context)

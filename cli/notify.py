@@ -7,4 +7,4 @@ def print_created(resource_name):
 
 def print_create_failed(resource_name, exception):
     """Print resource was unable to be created."""
-    print('Failed to create {}. Exception:{}'.format(resource_name,exception))
+    print('Failed to create {}. Exception:{}'.format(resource_name, exception))

@@ -26,7 +26,7 @@ def set_storage_account_key(context):
     storage_account_key = storage_keys['key1']
     context.obj['storage_account_key'] = storage_account_key
 
-def create_storage_acct_if_not_exists(context):
+def create_acct_if_not_exists(context):
     storage_client = context.obj['storage_client']
     availability = storage_client.storage_accounts.check_name_availability(
         context.obj['storage_account_name'])
@@ -52,15 +52,15 @@ def create_storage_acct_if_not_exists(context):
 
         # wait for storage account to be provisioning state 'Succeeded'
         print('Storage account is being allocated...')
-        provisioning_state = get_storage_account_provisioning_state(context)
+        provisioning_state = get_storage_account_state(context)
         while provisioning_state != 'Succeeded':
             time.sleep(ONE_SECOND)
             print('Waiting on storage account allocation...')
-            provisioning_state = get_storage_account_provisioning_state(context)
+            provisioning_state = get_storage_account_state(context)
         set_storage_account_key(context)
     return True
 
-def get_storage_account_provisioning_state(context):
+def get_storage_account_state(context):
     return context.obj['storage_client'].storage_accounts.get_properties(
         context.obj['resource_group'],
         context.obj['storage_account_name']).provisioning_state.value

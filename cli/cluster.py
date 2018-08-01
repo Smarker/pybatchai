@@ -16,16 +16,13 @@ def create_cluster(context):
         )
     )
 
-    try:
-        cluster_status = context.obj['batchai_client'].clusters.create(
-            context.obj['resource_group'],
-            context.obj['workspace'],
-            context.obj['cluster_name'],
-            parameters
-        ).result()
-        print(cluster_status)
-    except Exception:
-        cli.notify.print_create_failed(context.obj['cluster_name'], Exception)
+    cluster_status = context.obj['batchai_client'].clusters.create(
+        context.obj['resource_group'],
+        context.obj['workspace'],
+        context.obj['cluster_name'],
+        parameters
+    ).result()
+    print(cluster_status)
 
 def monitor_cluster(context):
     """Monitor the status of your batchai cluster."""
@@ -33,9 +30,9 @@ def monitor_cluster(context):
         context.obj['resource_group'],
         context.obj['workspace'],
         context.obj['cluster_name'])
-    print_cluster_status(cluster)
+    print_cluster_status(context, cluster)
 
-def print_cluster_status(cluster):
+def print_cluster_status(context, cluster):
     """Print the status of your batchai cluster."""
     print(
         'Cluster state: {0} Target: {1}; Allocated: {2}; Idle: {3}; '
@@ -51,7 +48,8 @@ def print_cluster_status(cluster):
     if not cluster.errors:
         return
     for error in cluster.errors:
-        print('Cluster error: {0}: {1}'.format(error.code, error.message))
+        cli.notify.print_create_failed(context.obj['cluster_name'],
+                                       error.message)
         if error.details:
             print('Details:')
             for detail in error.details:
