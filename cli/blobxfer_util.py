@@ -126,11 +126,11 @@ def create_local_source_path(context):
     local_source_path = blobxfer.api.LocalSourcePath()
     local_source_path.add_includes(['*.*'])
     local_source_path.add_excludes([])
-    local_source_path.add_paths([context.obj['data_dir']])
+    local_source_path.add_paths([context.obj['local_path']])
     return local_source_path
 
 def create_local_dest_path(context):
     local_destination_path = blobxfer.api.LocalDestinationPath()
     local_destination_path.is_dir = True
-    local_destination_path.path = context.obj['local_download_path']
+    local_destination_path.path = context.obj['local_path']
     return local_destination_path

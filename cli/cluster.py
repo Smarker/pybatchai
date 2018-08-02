@@ -6,13 +6,17 @@ def create_cluster(context):
     """Create a batchai cluster."""
     parameters = models.ClusterCreateParameters(
         vm_size=context.obj['vm_size'],
-        scale_settings=models.ScaleSettings(
-            manual=models.ManualScaleSettings(target_node_count=context.obj['node_count'])
-        ),
         user_account_settings=models.UserAccountSettings(
             admin_user_name=context.obj['admin_username'],
             admin_user_password=context.obj['admin_password'],
             admin_user_ssh_public_key=context.obj['admin_ssh_public_key'],
+        ),
+        vm_priority='dedicated'
+        scale_settings=models.ScaleSettings(
+            manual=models.ManualScaleSettings(target_node_count=context.obj['node_count'])
+        ),
+        virtual_machine_configuration=models.VirtualMachineConfiguration(
+            image_reference=context.obj['image']
         )
     )
 

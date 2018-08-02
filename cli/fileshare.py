@@ -13,7 +13,7 @@ def created_fileshare(context):
     shares = list(context.obj['fileshare_service'].list_shares(include_snapshots=True))
     return any(context.obj['fileshare_name'] == share.name for share in shares)
 
-def create_file_share_if_not_exists(context):
+def create_fileshare_if_not_exists(context):
     fileshare_name = context.obj['fileshare_name']
     if not created_fileshare(context):
         context.obj['fileshare_service'].create_share(fileshare_name,

@@ -25,7 +25,7 @@ storage \
 blobstorage \
 upload \
 --container-name data \
---data-dir <path to local data directory>
+--local-path <path to local data directory>
 ```
 
 Create a cluster.
