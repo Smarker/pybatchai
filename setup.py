@@ -11,9 +11,14 @@ setup(
         'azure-storage-file',
         'blobxfer',
         'Click',
-        'colorama',
-        'testresources',
+        'testresources'
     ],
+    extras_require={
+        'dev': [
+            'pytest',
+            'pylint'
+        ]
+    },
     entry_points={
         'console_scripts': ['pybatchai=pybatchai:cli']
     }

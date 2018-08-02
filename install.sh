@@ -1,3 +1,2 @@
 #!/usr/bin/env bash
-pip3 install -e . --user
-
+pip3 install -e .[dev] --user
