@@ -4,5 +4,4 @@ python:
 install:
   - pip3 install -e .[dev]
 script:
-  - pylint cli/
   - python setup.py test
