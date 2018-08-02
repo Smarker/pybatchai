@@ -4,5 +4,5 @@ python:
 install:
   - pip3 install -e .[dev]
 script:
-  - pylint --errors-only
+  - pylint cli/ --errors-only
   - python setup.py test
