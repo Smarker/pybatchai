@@ -4,4 +4,4 @@ python:
 install:
   - pip3 install -e .[dev] --user
 script:
-  - pytest && pylint --errors-only
+  - pytest && pylint cli/ --errors-only
