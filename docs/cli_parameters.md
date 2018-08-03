@@ -11,7 +11,7 @@
 | `aad-key` | str | AAD Secret Key. |
 | `aad-directory-id` | str | AAD Directory Id. |
 
-**NOTE:** The application **MUST** be assigned a `Contributor Role`.
+**NOTE:** The application **MUST** be assigned a [Contributor role](https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#contributor).
 
 ### Azure Active Directory (AAD)
 
