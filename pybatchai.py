@@ -180,8 +180,8 @@ def delete_cluster(
 @cluster.command(name='show')
 @click.pass_context
 def show_cluster(
-    context:object
-) -> None:
+        context:object
+    ) -> None:
     """Show details of your batchai cluster."""
     cli.cluster.show_cluster(context)
 
