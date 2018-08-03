@@ -4,4 +4,4 @@ python:
 install:
   - pip3 install -e .[dev]
 script:
-  - python setup.py test
+  - python setup.py tests/
