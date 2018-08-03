@@ -18,8 +18,10 @@ def create_rg_if_not_exists(context):
         base_url=AZURE_PUBLIC_CLOUD.endpoints.resource_manager)
 
     if not resource_group_exists:
-        context.obj['resource_client'].resource_groups.create_or_update(resource_group,
-                                                                        {'location': location})
+        context.obj['resource_client'].resource_groups.create_or_update(
+            resource_group,
+            {'location': location}
+        )
         LOGGER.info(cli.utils.created(RG_TYPE, resource_group))
     else:
         LOGGER.info(cli.utils.already_exists(RG_TYPE, resource_group))

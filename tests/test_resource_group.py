@@ -9,9 +9,9 @@ from cli.validation import validate_uuid, validate_rg_name, validate_location
 def test_validate_uuid(context, param, value):
     assert validate_uuid(context, param, value)
 
-@example(fixed_dictionaries({}), text(), 'rg_name')
-@example(fixed_dictionaries({}), text(), 'rg.name')
-@example(fixed_dictionaries({}), text(), 'rg-name')
+@example(fixed_dictionaries({}), text(), 'rg_name1')
+@example(fixed_dictionaries({}), text(), 'rg.mylongername')
+@example(fixed_dictionaries({}), text(), 'rg-aNoTher--name')
 @given(fixed_dictionaries({}), text(), from_regex(RG_NAME_PATTERN))
 def test_validate_rg_name(context, param, value):
     assert validate_rg_name(context, param, value)

@@ -8,25 +8,27 @@ import cli.resource_group
 import cli.validation
 
 @click.group()
-@click.option('--subscription-id', required=True, 
+@click.option('--subscription-id', required=True,
               callback=cli.validation.validate_uuid)
-@click.option('--resource-group', required=True, help='resource group name', 
+@click.option('--resource-group', required=True, help='resource group name',
               callback=cli.validation.validate_rg_name)
 @click.option('--location', required=True, default='eastus',
               callback=cli.validation.validate_location)
-@click.option('--aad-app-id', required=True, 
+@click.option('--aad-app-id', required=True,
               callback=cli.validation.validate_uuid)
 @click.option('--aad-key', required=True)
 @click.option('--aad-directory-id', required=True,
               callback=cli.validation.validate_uuid)
 @click.pass_context
-def main(context: object,
-         subscription_id: str,
-         resource_group: str,
-         location: str,
-         aad_app_id: str,
-         aad_key: str,
-         aad_directory_id: str) -> None:
+def main(
+        context: object,
+        subscription_id: str,
+        resource_group: str,
+        location: str,
+        aad_app_id: str,
+        aad_key: str,
+        aad_directory_id: str
+    ) -> None:
     """A Python tool for Batch AI.
 
     At minimum you must have:
@@ -62,17 +64,23 @@ def main(context: object,
 
 @main.group()
 @click.pass_context
-def storage(context: object) -> None:
+def storage(
+        context: object
+    ) -> None:
     pass
 
 @storage.group()
 @click.pass_context
-def fileshare(context: object) -> None:
+def fileshare(
+        context: object
+    ) -> None:
     pass
 
 @fileshare.command(name='upload')
 @click.pass_context
-def upload_to_fileshare(context: object) -> None:
+def upload_to_fileshare(
+        context: object
+    ) -> None:
     pass
 
 

@@ -25,8 +25,8 @@ def validate_rg_name(context, param, value):
         return value
     else:
         raise click.BadParameter("""Resource group name should be 1-90
-        characters. Characters may be case insensitive, alphanumeric,
-        underscore, parentheses, hyphen, period (except at end), and Unicode characters.""")
+characters. Characters may be case insensitive, alphanumeric,
+underscore, parentheses, hyphen, period (except at end), and Unicode characters.""")
 
 def validate_location(context, param, value):
     '''location is alphabetic with an optional 2 at the end'''
