@@ -1,10 +1,13 @@
 import logging
 
 from azure.common.credentials import ServicePrincipalCredentials
+import azure.mgmt.batchai as training
+from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
 import click
 import coloredlogs
 
 import cli.blob_storage
+import cli.cluster
 import cli.fileshare
 import cli.resource_group
 import cli.storage
@@ -150,6 +153,47 @@ def download_from_blob_container(
     context.obj['local_path'] = local_path
     cli.blob_storage.download(context)
 
+@main.group()
+@click.option('--name', required=True, help='cluster name',
+              callback=cli.validation.validate_cluster_name)
+@click.option('--workspace', required=True, help='workspace name',
+              callback=cli.validation.validate_workspace_name)
+@click.pass_context
+def cluster(
+        context: object,
+        name: str,
+        workspace: str
+    ) -> None:
+    """Cluster."""
+    context.obj['cluster_name'] = name
+    context.obj['workspace'] = workspace
+    create_batchai_client(context)
+
+@cluster.command(name='delete')
+@click.pass_context
+def delete_cluster(
+        context: object
+    ) -> None:
+    """Delete your batchai cluster."""
+    cli.cluster.delete_cluster(context)
+
+@cluster.command(name='show')
+@click.pass_context
+def show_cluster(
+    context:object
+) -> None:
+    """Show details of your batchai cluster."""
+    cli.cluster.show_cluster(context)
+
+def create_batchai_client(context: object) -> None:
+    """Client to create batchai resources."""
+    if 'batchai_client' not in context.obj:
+        batchai_client = training.BatchAIManagementClient(
+            credentials=context.obj['aad_credentials'],
+            subscription_id=context.obj['subscription_id'],
+            base_url=AZURE_PUBLIC_CLOUD.endpoints.resource_manager)
+        context.obj['batchai_client'] = batchai_client
+
 main.add_command(storage)
 storage.add_command(fileshare)
 fileshare.add_command(upload_to_fileshare)
@@ -157,6 +201,9 @@ fileshare.add_command(download_fileshare)
 storage.add_command(blobstorage)
 blobstorage.add_command(upload_to_blob_container)
 blobstorage.add_command(download_from_blob_container)
+main.add_command(cluster)
+cluster.add_command(delete_cluster)
+cluster.add_command(show_cluster)
 
 if __name__ == '__main__':
     main()
