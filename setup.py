@@ -4,7 +4,7 @@ setup(
     name="pybatchai",
     version='0.0.1',
     install_requires=[
-        'Click'
+        'Click',
         'coloredlogs',
         'logging',
         'uuid'
