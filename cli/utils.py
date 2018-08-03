@@ -1,6 +1,3 @@
-RG_NAME_PATTERN = '^[-\w\._\(\)]{1,90}[^\.]$'
-LOCATION_PATTERN = '^[a-zA-Z]+2?$'
-
 def already_exists(resource_type, resource_name):
     return '{} {} already exists.'.format(resource_type, resource_name)
 
