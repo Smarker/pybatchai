@@ -4,6 +4,7 @@ from azure.common.credentials import ServicePrincipalCredentials
 import click
 import coloredlogs
 
+import cli.blob_storage
 import cli.fileshare
 import cli.resource_group
 import cli.storage
@@ -116,32 +117,36 @@ def download_fileshare(
     cli.fileshare.download(context)
 
 @storage.group()
+@click.option('--container', required=True, help='container name',
+              callback=cli.validation.validate_container_name)
 @click.pass_context
 def blobstorage(
-        context: object
+        context: object,
+        container: str
     ) -> None:
     """Blob Storage."""
     cli.blob_storage.set_blob_storage_service(context)
+    context.obj['container_name'] = container
 
 @blobstorage.command(name='upload')
-@click.option('--container', required=True, help='container name')
-@click.option('--local-path', required=True)
+@click.option('--local-path', required=True, type=click.Path(exists=True))
 @click.pass_context
-def upload_to_blob_container(context: object, container: str,
-    local_path: str) -> None:
+def upload_to_blob_container(
+        context: object,
+        local_path: str
+    ) -> None:
     """Upload directory or file to blob container."""
-    context.obj['container_name'] = container
     context.obj['local_path'] = local_path
     cli.blob_storage.upload(context)
 
 @blobstorage.command(name='download')
-@click.option('--container', required=True, help='container name')
-@click.option('--local-path', required=True)
+@click.option('--local-path', required=True, type=click.Path())
 @click.pass_context
-def download_from_blob_container(context: object, container: str,
-    local_path: str) -> None:
+def download_from_blob_container(
+        context: object,
+        local_path: str
+    ) -> None:
     """Download directory or file from blob container."""
-    context.obj['container_name'] = container
     context.obj['local_path'] = local_path
     cli.blob_storage.download(context)
 
