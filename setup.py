@@ -6,7 +6,6 @@ setup(
     install_requires=[
         'Click',
         'coloredlogs',
-        'logging',
         'uuid'
     ],
     extras_require={
