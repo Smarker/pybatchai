@@ -16,5 +16,6 @@ REGEX_DICT = {
     'resource_group_name': RG_NAME_PATTERN,
     'location': LOCATION_PATTERN,
     'storage_account_name': STORAGE_NAME_PATTERN,
-    'fileshare_name': SHARE_OR_CONTAINER_PATTERN
+    'fileshare_name': SHARE_OR_CONTAINER_PATTERN,
+    'container_name': SHARE_OR_CONTAINER_PATTERN
 }
