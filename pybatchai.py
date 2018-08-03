@@ -115,10 +115,43 @@ def download_fileshare(
     context.obj['local_path'] = local_path
     cli.fileshare.download(context)
 
+@storage.group()
+@click.pass_context
+def blobstorage(
+        context: object
+    ) -> None:
+    """Blob Storage."""
+    cli.blob_storage.set_blob_storage_service(context)
+
+@blobstorage.command(name='upload')
+@click.option('--container', required=True, help='container name')
+@click.option('--local-path', required=True)
+@click.pass_context
+def upload_to_blob_container(context: object, container: str,
+    local_path: str) -> None:
+    """Upload directory or file to blob container."""
+    context.obj['container_name'] = container
+    context.obj['local_path'] = local_path
+    cli.blob_storage.upload(context)
+
+@blobstorage.command(name='download')
+@click.option('--container', required=True, help='container name')
+@click.option('--local-path', required=True)
+@click.pass_context
+def download_from_blob_container(context: object, container: str,
+    local_path: str) -> None:
+    """Download directory or file from blob container."""
+    context.obj['container_name'] = container
+    context.obj['local_path'] = local_path
+    cli.blob_storage.download(context)
+
 main.add_command(storage)
 storage.add_command(fileshare)
 fileshare.add_command(upload_to_fileshare)
 fileshare.add_command(download_fileshare)
+storage.add_command(blobstorage)
+blobstorage.add_command(upload_to_blob_container)
+blobstorage.add_command(download_from_blob_container)
 
 if __name__ == '__main__':
     main()
