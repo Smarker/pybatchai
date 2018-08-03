@@ -1,8 +1,17 @@
+# python
 __pycache__/
 build/
 dist/
 wheels/
-.env
-.vscode
 *.egg-info
+
+# tests
 .pytest_cache
+.cache
+.hypothesis
+
+# ide
+.vscode
+
+# env
+.env
