@@ -3,5 +3,4 @@ python:
   - "3.6"
 install:
   - pip3 install -e .[dev]
-script:
-  - python setup.py tests/
+script: pytest
