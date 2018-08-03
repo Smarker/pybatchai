@@ -1,6 +1,6 @@
+import click
 import re
 from uuid import UUID
-import click
 
 from cli.utils import RG_NAME_PATTERN
 from cli.utils import LOCATION_PATTERN
