@@ -4,7 +4,9 @@ from azure.common.credentials import ServicePrincipalCredentials
 import click
 import coloredlogs
 
+import cli.fileshare
 import cli.resource_group
+import cli.storage
 import cli.validation
 
 @click.group()
@@ -63,30 +65,60 @@ def main(
     cli.resource_group.create_rg_if_not_exists(context)
 
 @main.group()
+@click.option('--name', required=True, help='storage account name',
+              callback=cli.validation.validate_storage_name)
 @click.pass_context
 def storage(
-        context: object
+        context: object,
+        name: str
     ) -> None:
-    pass
+    """Storage options."""
+    context.obj['storage_account'] = name
+    cli.storage.set_storage_client(context)
+    valid_storage_acct = cli.storage.create_acct_if_not_exists(context)
+    if not valid_storage_acct:
+        return
+    cli.storage.set_storage_account_key(context)
 
 @storage.group()
+@click.option('--name', required=True, help='fileshare name',
+              callback=cli.validation.validate_fileshare_name)
 @click.pass_context
 def fileshare(
-        context: object
+        context: object,
+        name: str
     ) -> None:
-    pass
+    """Fileshare."""
+    context.obj['fileshare'] = name
 
 @fileshare.command(name='upload')
+@click.option('--local-path', required=True, type=click.Path(exists=True),
+              help='upload files or a directory at this path')
 @click.pass_context
 def upload_to_fileshare(
-        context: object
+        context: object,
+        local_path: str
     ) -> None:
-    pass
+    """Upload directory or file to fileshare."""
+    context.obj['local_path'] = local_path
+    cli.fileshare.upload(context)
 
+@fileshare.command(name='download')
+@click.option('--local-path', required=True, type=click.Path(),
+              help='download files or a directory at this path')
+@click.pass_context
+def download_fileshare(
+        context: object,
+        local_path: str
+    ) -> None:
+    """Download directory or file from fileshare."""
+    context.obj['local_path'] = local_path
+    cli.fileshare.download(context)
 
 main.add_command(storage)
 storage.add_command(fileshare)
 fileshare.add_command(upload_to_fileshare)
+fileshare.add_command(download_fileshare)
 
 if __name__ == '__main__':
     main()
