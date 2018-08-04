@@ -6,6 +6,9 @@ setup(
     install_requires=[
         'azure',
         'azure-mgmt >= 2.0.0',
+        'azure-storage-blob ~= 1.3.0',
+        'azure-storage-file ~= 1.3.0',
+        'blobxfer',
         'Click',
         'coloredlogs',
         'uuid'
