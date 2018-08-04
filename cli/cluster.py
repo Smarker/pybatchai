@@ -18,7 +18,6 @@ def delete_cluster(context):
 
 def show_cluster(context):
     cluster_details = cluster_exists(context)
-    print(cluster_details)
     if cluster_details:
         print_cluster_status(context, cluster_details)
 
