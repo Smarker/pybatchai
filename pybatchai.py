@@ -4,6 +4,7 @@ from azure.common.credentials import ServicePrincipalCredentials
 import click
 import coloredlogs
 
+#import cli.cluster
 import cli.fileshare
 import cli.resource_group
 import cli.storage
@@ -63,6 +64,88 @@ def main(
     }
 
     cli.resource_group.create_rg_if_not_exists(context)
+
+@main.group()
+@click.pass_context
+def cluster(
+        context: object,
+    ) -> None:
+    """Cluster."""
+    pass
+
+@cluster.command(name='create')
+@click.option('--name', required=True, help='cluster name',
+              callback=cli.validation.validate_cluster_name)
+@click.option('--workspace', required=True, help='name of workspace',
+              callback=cli.validation.validate_workspace_name)
+@click.option('--afs-mount-path', required=False, type=click.Path(),
+              default='afs', help='mount path for azure file share')
+@click.option('--afs-name', required=False,
+              help='name of afs to be mounted on each node',
+              callback=cli.validation.validate_afs_name)
+@click.option('--bfs-mount-path', required=False, type=click.Path(),
+              default='bfs', help='mount path for storage container')
+@click.option('--bfs-name', required=False,
+              help='name of storage container to be mounted on each node',
+              callback=cli.validation.validate_bfs_name)
+@click.option('--image', required=False, help='os image alias',
+              callback=cli.validation.validate_image_name)
+@click.option('--max', required=False, type=click.IntRange(min=0),
+              help='max nodes for auto-scale cluster')
+@click.option('--min', required=False, type=click.IntRange(min=0),
+              help='min nodes for auto-scale cluster')
+@click.option('--password', required=False,
+              help='optional password for admin user on each node',
+              callback=cli.validation.validate_password)
+@click.option('--ssh-key', required=False, type=click.Path(exists=True),
+              help='optional path to SSH public key')
+@click.option('--storage-account-key', required=False, help='storage account key',
+              callback=cli.validation.validate_storage_key)
+@click.option('--storage-account-name', required=False,
+              help='storage account for azure file shares and/or azure storage containers',
+              callback=cli.validation.validate_storage_account_name)
+@click.option('--user-name', required=False,
+              help='username for admin user on each node',
+              callback=cli.validation.validate_user_name)
+@click.option('--vm-priority', required=False, help='VM priority',
+              type=click.Choice(['dedicated', 'lowpriority']))
+@click.option('--vm-size', required=False, help='VM size for nodes',
+              callback=cli.validation.validate_vm_size)
+def create_cluster(
+        workspace: str,
+        afs_path: str,
+        afs_name: str,
+        bfs_path: str,
+        bfs_name: str,
+        image_name: str,
+        max_nodes: int,
+        min_nodes: int,
+        admin_pass: str,
+        ssh_key: str,
+        storage_key: str,
+        storage_name: str,
+        admin_uname: str,
+        vm_priority: str,
+        vm_size: str
+    ) -> None:
+    """Create a cluster."""
+    print(
+        'workspace:', workspace,
+        'afs_path:', afs_path,
+        'afs_name:', afs_name,
+        'bfs_path:', bfs_path,
+        'bfs_name:', bfs_name,
+        'image_name:', image_name,
+        'max_nodes:', max_nodes,
+        'min_nodes:', min_nodes,
+        'admin_pass:', admin_pass,
+        'ssh_key:', ssh_key,
+        'storage_key:', storage_key,
+        'storage_name:', storage_name,
+        'admin_uname:', admin_uname,
+        'vm_priority:', vm_priority,
+        'vm_size:', vm_size
+    )
 
 @main.group()
 @click.option('--name', required=True, help='storage account name',

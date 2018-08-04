@@ -11,7 +11,7 @@ def create_cluster(context):
             admin_user_password=context.obj['admin_password'],
             admin_user_ssh_public_key=context.obj['admin_ssh_public_key'],
         ),
-        vm_priority='dedicated'
+        vm_priority='dedicated',
         scale_settings=models.ScaleSettings(
             manual=models.ManualScaleSettings(target_node_count=context.obj['node_count'])
         ),
