@@ -68,6 +68,10 @@ def validate_user_name():
 def validate_vm_size():
     pass
 
+def validate_container_name(context, param, value):
+    return regex_matches(REGEX_DICT['container_name'], value,
+                         'See https://docs.microsoft.com/en-us/rest/api/storageservices/Naming-and-Referencing-Shares--Directories--Files--and-Metadata?redirectedfrom=MSDN#share-names for name format')
+
 def regex_matches(pattern, value, bad_param_message):
     pattern = re.compile(pattern)
     if pattern.match(value):
