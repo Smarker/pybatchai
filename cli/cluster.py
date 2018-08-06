@@ -9,19 +9,51 @@ LOGGER = logging.getLogger(__name__)
 CLUSTER_TYPE = 'cluster'
 
 def create_cluster(context):
+    AFS_URL = 'https://{}.file.core.windows.net/{}'.format(
+        context.obj['storage_account_name'],
+        context.obj['afs_name']
+    )
+
     params = models.ClusterCreateParameters(
         vm_size=context.obj['vm_size'],
+        vm_priority=context.obj['vm_priority'],
+        scale_settings=models.ScaleSettings(
+            auto=models.AutoScaleSettings(
+                minimum_node_count=context.obj[min],
+                maximum_node_count=context.obj[max]
+            )
+        ),
+        virtual_machine_configuration=models.VirtualMachineConfiguration(
+            image_reference=context.obj['image']
+        ),
+        node_setup=models.NodeSetup(
+            mount_volumes=models.MountVolumes(
+                azure_file_shares=[
+                    models.AzureFileShareReference(
+                        account_name=context.obj['storage_account_name'],
+                        azure_file_url=AFS_URL,
+                        credentials=models.AzureStorageCredentialsInfo(
+                            account_key=context.obj['storage_account_key']
+                        ),
+                        relative_mount_path=context.obj['afs_mount_path']
+                    )
+                ],
+                azure_blob_file_systems=[
+                    models.AzureBlobFileSystemReference(
+                        account_name=context.obj['storage_account_name'],
+                        container_name=context.obj['bfs_name'],
+                        credentials=models.AzureStorageCredentialsInfo(
+                            account_key=context.obj['storage_account_key']
+                        ),
+                        relative_mount_path=context.obj['bfs_mount_path']
+                    )
+                ]
+            )
+        ),
         user_account_settings=models.UserAccountSettings(
             admin_user_name=context.obj['user_name'],
             admin_user_password=context.obj['password'],
             admin_user_ssh_public_key=context.obj['ssh_key'],
-        ),
-        vm_priority=context.obj['vm_priority'],
-        # scale_settings=models.ScaleSettings(
-        #     manual=models.ManualScaleSettings(target_node_count=context.obj['node_count'])
-        # ),
-        virtual_machine_configuration=models.VirtualMachineConfiguration(
-            image_reference=context.obj['image']
         )
     )
 
