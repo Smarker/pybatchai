@@ -5,6 +5,7 @@ import click
 import coloredlogs
 
 #import cli.cluster
+import cli.blob_storage
 import cli.fileshare
 import cli.resource_group
 import cli.storage
@@ -198,10 +199,47 @@ def download_fileshare(
     context.obj['local_path'] = local_path
     cli.fileshare.download(context)
 
+@storage.group()
+@click.option('--container', required=True, help='container name',
+              callback=cli.validation.validate_container_name)
+@click.pass_context
+def blobstorage(
+        context: object,
+        container: str
+    ) -> None:
+    """Blob Storage."""
+    cli.blob_storage.set_blob_storage_service(context)
+    context.obj['container_name'] = container
+
+@blobstorage.command(name='upload')
+@click.option('--local-path', required=True, type=click.Path(exists=True))
+@click.pass_context
+def upload_to_blob_container(
+        context: object,
+        local_path: str
+    ) -> None:
+    """Upload directory or file to blob container."""
+    context.obj['local_path'] = local_path
+    cli.blob_storage.upload(context)
+
+@blobstorage.command(name='download')
+@click.option('--local-path', required=True, type=click.Path())
+@click.pass_context
+def download_from_blob_container(
+        context: object,
+        local_path: str
+    ) -> None:
+    """Download directory or file from blob container."""
+    context.obj['local_path'] = local_path
+    cli.blob_storage.download(context)
+
 main.add_command(storage)
 storage.add_command(fileshare)
 fileshare.add_command(upload_to_fileshare)
 fileshare.add_command(download_fileshare)
+storage.add_command(blobstorage)
+blobstorage.add_command(upload_to_blob_container)
+blobstorage.add_command(download_from_blob_container)
 
 if __name__ == '__main__':
     main()
