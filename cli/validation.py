@@ -22,11 +22,6 @@ def validate_rg_name(context, param, value):
     return regex_matches(REGEX_DICT['resource_group_name'], value,
                          'Resource group name should be 1-90 characters. Characters may be case insensitive, alphanumeric, underscore, parentheses, hyphen, period (except at end), and Unicode characters.')
 
-def validate_location(context, param, value):
-    '''location is alphabetic with an optional 2 at the end'''
-    return regex_matches(REGEX_DICT['location'], value,
-                         'location must be lowercase alphabetic with an optional 2 at the end')
-
 def validate_storage_name(context, param, value):
     return regex_matches(REGEX_DICT['storage_account_name'], value,
                          'storage account name must be between 3 and 24 characters in length and may contain numbers and lowercase letters only.')

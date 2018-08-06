@@ -1,5 +1,4 @@
 RG_NAME_PATTERN = '^[-\w\._\(\)]{1,90}[^\.]$'
-LOCATION_PATTERN = '^[a-zA-Z]+2?$'
 STORAGE_NAME_PATTERN = '^[a-z0-9]{3,24}$'
 # String ahead does not contain two dashes
 DOES_NOT_CONTAIN_TWO_DASH = '(?!.+--)'
@@ -16,7 +15,6 @@ WORKSPACE_NAME_PATTERN = '^[\w-]{1,64}$'
 
 REGEX_DICT = {
     'resource_group_name': RG_NAME_PATTERN,
-    'location': LOCATION_PATTERN,
     'storage_account_name': STORAGE_NAME_PATTERN,
     'fileshare_name': SHARE_OR_CONTAINER_PATTERN,
     'container_name': SHARE_OR_CONTAINER_PATTERN,

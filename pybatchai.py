@@ -8,6 +8,7 @@ import coloredlogs
 
 import cli.blob_storage
 import cli.cluster
+import cli.constants
 import cli.fileshare
 import cli.resource_group
 import cli.storage
@@ -19,7 +20,7 @@ import cli.validation
 @click.option('--resource-group', required=True, help='resource group name',
               callback=cli.validation.validate_rg_name)
 @click.option('--location', required=True, default='eastus',
-              callback=cli.validation.validate_location)
+              type=click.Choice(cli.constants.AVAILABLE_REGIONS))
 @click.option('--aad-app-id', required=True,
               callback=cli.validation.validate_uuid)
 @click.option('--aad-key', required=True)
