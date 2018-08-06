@@ -1,10 +1,13 @@
 import logging
 
 from azure.common.credentials import ServicePrincipalCredentials
+import azure.mgmt.batchai as training
+from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
 import click
 import coloredlogs
 
-#import cli.cluster
+import cli.blob_storage
+import cli.cluster
 import cli.fileshare
 import cli.resource_group
 import cli.storage
@@ -66,18 +69,107 @@ def main(
     cli.resource_group.create_rg_if_not_exists(context)
 
 @main.group()
+@click.option('--name', required=True, help='storage account name',
+              callback=cli.validation.validate_storage_name)
+@click.pass_context
+def storage(
+        context: object,
+        name: str
+    ) -> None:
+    """Storage options."""
+    context.obj['storage_account'] = name
+    cli.storage.set_storage_client(context)
+    valid_storage_acct = cli.storage.create_acct_if_not_exists(context)
+    if not valid_storage_acct:
+        return
+    cli.storage.set_storage_account_key(context)
+
+@storage.group()
+@click.option('--name', required=True, help='fileshare name',
+              callback=cli.validation.validate_fileshare_name)
+@click.pass_context
+def fileshare(
+        context: object,
+        name: str
+    ) -> None:
+    """Fileshare."""
+    context.obj['fileshare'] = name
+
+@fileshare.command(name='upload')
+@click.option('--local-path', required=True, type=click.Path(exists=True),
+              help='upload files or a directory at this path')
+@click.pass_context
+def upload_to_fileshare(
+        context: object,
+        local_path: str
+    ) -> None:
+    """Upload directory or file to fileshare."""
+    context.obj['local_path'] = local_path
+    cli.fileshare.upload(context)
+
+@fileshare.command(name='download')
+@click.option('--local-path', required=True, type=click.Path(),
+              help='download files or a directory at this path')
+@click.pass_context
+def download_fileshare(
+        context: object,
+        local_path: str
+    ) -> None:
+    """Download directory or file from fileshare."""
+    context.obj['local_path'] = local_path
+    cli.fileshare.download(context)
+
+@storage.group()
+@click.option('--container', required=True, help='container name',
+              callback=cli.validation.validate_container_name)
+@click.pass_context
+def blobstorage(
+        context: object,
+        container: str
+    ) -> None:
+    """Blob Storage."""
+    cli.blob_storage.set_blob_storage_service(context)
+    context.obj['container_name'] = container
+
+@blobstorage.command(name='upload')
+@click.option('--local-path', required=True, type=click.Path(exists=True))
+@click.pass_context
+def upload_to_blob_container(
+        context: object,
+        local_path: str
+    ) -> None:
+    """Upload directory or file to blob container."""
+    context.obj['local_path'] = local_path
+    cli.blob_storage.upload(context)
+
+@blobstorage.command(name='download')
+@click.option('--local-path', required=True, type=click.Path())
+@click.pass_context
+def download_from_blob_container(
+        context: object,
+        local_path: str
+    ) -> None:
+    """Download directory or file from blob container."""
+    context.obj['local_path'] = local_path
+    cli.blob_storage.download(context)
+
+@main.group()
+@click.option('--name', required=True, help='cluster name',
+              callback=cli.validation.validate_cluster_name)
+@click.option('--workspace', required=True, help='workspace name',
+              callback=cli.validation.validate_workspace_name)
 @click.pass_context
 def cluster(
         context: object,
+        name: str,
+        workspace: str
     ) -> None:
     """Cluster."""
-    pass
+    context.obj['cluster_name'] = name
+    context.obj['workspace'] = workspace
+    create_batchai_client(context)
 
 @cluster.command(name='create')
-@click.option('--name', required=True, help='cluster name',
-              callback=cli.validation.validate_cluster_name)
-@click.option('--workspace', required=True, help='name of workspace',
-              callback=cli.validation.validate_workspace_name)
 @click.option('--afs-mount-path', required=False, type=click.Path(),
               default='afs', help='mount path for azure file share')
 @click.option('--afs-name', required=False,
@@ -147,61 +239,41 @@ def create_cluster(
         'vm_size:', vm_size
     )
 
-@main.group()
-@click.option('--name', required=True, help='storage account name',
-              callback=cli.validation.validate_storage_name)
+@cluster.command(name='delete')
 @click.pass_context
-def storage(
-        context: object,
-        name: str
+def delete_cluster(
+        context: object
     ) -> None:
-    """Storage options."""
-    context.obj['storage_account'] = name
-    cli.storage.set_storage_client(context)
-    valid_storage_acct = cli.storage.create_acct_if_not_exists(context)
-    if not valid_storage_acct:
-        return
-    cli.storage.set_storage_account_key(context)
+    """Delete your batchai cluster."""
+    cli.cluster.delete_cluster(context)
 
-@storage.group()
-@click.option('--name', required=True, help='fileshare name',
-              callback=cli.validation.validate_fileshare_name)
+@cluster.command(name='show')
 @click.pass_context
-def fileshare(
-        context: object,
-        name: str
+def show_cluster(
+        context:object
     ) -> None:
-    """Fileshare."""
-    context.obj['fileshare'] = name
+    """Show details of your batchai cluster."""
+    cli.cluster.show_cluster(context)
 
-@fileshare.command(name='upload')
-@click.option('--local-path', required=True, type=click.Path(exists=True),
-              help='upload files or a directory at this path')
-@click.pass_context
-def upload_to_fileshare(
-        context: object,
-        local_path: str
-    ) -> None:
-    """Upload directory or file to fileshare."""
-    context.obj['local_path'] = local_path
-    cli.fileshare.upload(context)
-
-@fileshare.command(name='download')
-@click.option('--local-path', required=True, type=click.Path(),
-              help='download files or a directory at this path')
-@click.pass_context
-def download_fileshare(
-        context: object,
-        local_path: str
-    ) -> None:
-    """Download directory or file from fileshare."""
-    context.obj['local_path'] = local_path
-    cli.fileshare.download(context)
+def create_batchai_client(context: object) -> None:
+    """Client to create batchai resources."""
+    if 'batchai_client' not in context.obj:
+        batchai_client = training.BatchAIManagementClient(
+            credentials=context.obj['aad_credentials'],
+            subscription_id=context.obj['subscription_id'],
+            base_url=AZURE_PUBLIC_CLOUD.endpoints.resource_manager)
+        context.obj['batchai_client'] = batchai_client
 
 main.add_command(storage)
 storage.add_command(fileshare)
 fileshare.add_command(upload_to_fileshare)
 fileshare.add_command(download_fileshare)
+storage.add_command(blobstorage)
+blobstorage.add_command(upload_to_blob_container)
+blobstorage.add_command(download_from_blob_container)
+main.add_command(cluster)
+cluster.add_command(delete_cluster)
+cluster.add_command(show_cluster)
 
 if __name__ == '__main__':
     main()

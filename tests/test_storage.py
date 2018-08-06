@@ -2,6 +2,7 @@ from hypothesis import given, example
 from hypothesis.strategies import fixed_dictionaries, text, from_regex
 
 from cli.regex import REGEX_DICT
+import cli.storage
 from cli.validation import validate_storage_name
 
 @example(fixed_dictionaries({}), text(), 'mystorage')

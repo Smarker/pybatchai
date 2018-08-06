@@ -35,12 +35,6 @@ def validate_fileshare_name(context, param, value):
     return regex_matches(REGEX_DICT['fileshare_name'], value,
                          'See https://docs.microsoft.com/en-us/rest/api/storageservices/Naming-and-Referencing-Shares--Directories--Files--and-Metadata?redirectedfrom=MSDN#share-names for name format')
 
-def validate_cluster_name():
-    pass
-
-def validate_workspace_name():
-    pass
-
 def validate_afs_name():
     pass
 
@@ -67,6 +61,16 @@ def validate_user_name():
 
 def validate_vm_size():
     pass
+
+def validate_container_name(context, param, value):
+    return regex_matches(REGEX_DICT['container_name'], value,
+                         'See https://docs.microsoft.com/en-us/rest/api/storageservices/Naming-and-Referencing-Shares--Directories--Files--and-Metadata?redirectedfrom=MSDN#share-names for name format')
+
+def validate_cluster_name(context, param, value):
+    return regex_matches(REGEX_DICT['cluster_name'], value, 'Names can only contain a combination of alphanumeric characters along with dash (-) and underscore (_). The name must be from 1 through 64 characters long.')
+
+def validate_workspace_name(context, param, value):
+    return regex_matches(REGEX_DICT['workspace'], value, 'Names can only contain a combination of alphanumeric characters along with dash (-) and underscore (_). The name must be from 1 through 64 characters long.')
 
 def regex_matches(pattern, value, bad_param_message):
     pattern = re.compile(pattern)

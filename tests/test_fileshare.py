@@ -1,6 +1,7 @@
 from hypothesis import given, example
 from hypothesis.strategies import fixed_dictionaries, text, from_regex
 
+import cli.fileshare
 from cli.regex import REGEX_DICT
 from cli.validation import validate_fileshare_name
 

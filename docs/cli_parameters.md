@@ -11,7 +11,7 @@
 | `aad-key` | str | AAD Secret Key. |
 | `aad-directory-id` | str | AAD Directory Id. |
 
-**NOTE:** The application **MUST** be assigned a `Contributor Role`.
+**NOTE:** The application **MUST** be assigned a [Contributor role](https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#contributor).
 
 ### Azure Active Directory (AAD)
 
@@ -37,8 +37,21 @@ or [detailed guide](https://docs.microsoft.com/en-us/azure/azure-resource-manage
 | --------------- | ---- | ----------- |
 | `name` | str | See [fileshare names](https://docs.microsoft.com/en-us/rest/api/storageservices/Naming-and-Referencing-Shares--Directories--Files--and-Metadata?redirectedfrom=MSDN#share-names) for more details on its stricter naming policy. |
 
+## blob storage
+
+| parameter       | type | description |
+| --------------- | ---- | ----------- |
+| `container` | str | See [container names](https://docs.microsoft.com/en-us/rest/api/storageservices/Naming-and-Referencing-Shares--Directories--Files--and-Metadata?redirectedfrom=MSDN#share-names) for more details on its stricter naming policy. |
+
 ## upload or download to fileshare or blob
 
 | parameter       | type | description |
 | --------------- | ---- | ----------- |
 | `local-path` | str | Path on local machine to `upload` files from or `download` files to. |
+
+## cluster
+
+| parameter       | type | description |
+| --------------- | ---- | ----------- |
+| `name` | str | Batch AI cluster name. |
+| `workspace` | str | Workspace name. |
