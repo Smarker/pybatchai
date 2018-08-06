@@ -203,41 +203,40 @@ def cluster(
               type=click.Choice(['dedicated', 'lowpriority']))
 @click.option('--vm-size', required=False, help='VM size for nodes',
               callback=cli.validation.validate_vm_size)
+@click.pass_context
 def create_cluster(
-        workspace: str,
-        afs_path: str,
+        context: object,
+        afs_mount_path: str,
         afs_name: str,
-        bfs_path: str,
+        bfs_mount_path: str,
         bfs_name: str,
-        image_name: str,
-        max_nodes: int,
-        min_nodes: int,
-        admin_pass: str,
+        image: str,
+        max: int,
+        min: int,
+        password: str,
         ssh_key: str,
-        storage_key: str,
-        storage_name: str,
-        admin_uname: str,
+        storage_account_key: str,
+        storage_account_name: str,
+        user_name: str,
         vm_priority: str,
         vm_size: str
     ) -> None:
     """Create a cluster."""
-    print(
-        'workspace:', workspace,
-        'afs_path:', afs_path,
-        'afs_name:', afs_name,
-        'bfs_path:', bfs_path,
-        'bfs_name:', bfs_name,
-        'image_name:', image_name,
-        'max_nodes:', max_nodes,
-        'min_nodes:', min_nodes,
-        'admin_pass:', admin_pass,
-        'ssh_key:', ssh_key,
-        'storage_key:', storage_key,
-        'storage_name:', storage_name,
-        'admin_uname:', admin_uname,
-        'vm_priority:', vm_priority,
-        'vm_size:', vm_size
-    )
+    context.obj['afs_mount_path'] = afs_mount_path
+    context.obj['afs_name'] = afs_name
+    context.obj['bfs_mount_path'] = bfs_mount_path
+    context.obj['bfs_name'] = bfs_name
+    context.obj['image'] = image
+    context.obj['max'] = max
+    context.obj['min'] = min
+    context.obj['password'] = password
+    context.obj['ssh_key'] = ssh_key
+    context.obj['storage_account_key'] = storage_account_key
+    context.obj['storage_account_name'] = storage_account_name
+    context.obj['user_name'] = user_name
+    context.obj['vm_priority'] = vm_priority
+    context.obj['vm_size'] = vm_size
+    cli.cluster.create_cluster(context)
 
 @cluster.command(name='delete')
 @click.pass_context
