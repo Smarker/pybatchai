@@ -182,9 +182,9 @@ def cluster(
               callback=cli.validation.validate_bfs_name)
 @click.option('--image', required=False, help='os image alias',
               callback=cli.validation.validate_image_name)
-@click.option('--max', required=False, type=click.IntRange(min=0),
+@click.option('--max-nodes', required=True, type=click.IntRange(min=0),
               help='max nodes for auto-scale cluster')
-@click.option('--min', required=False, type=click.IntRange(min=0),
+@click.option('--min-nodes', required=True, type=click.IntRange(min=0),
               help='min nodes for auto-scale cluster')
 @click.option('--password', required=False,
               help='optional password for admin user on each node',
@@ -196,12 +196,12 @@ def cluster(
 @click.option('--storage-account-name', required=False,
               help='storage account for azure file shares and/or azure storage containers',
               callback=cli.validation.validate_storage_account_name)
-@click.option('--user-name', required=False,
+@click.option('--user-name', required=True,
               help='username for admin user on each node',
               callback=cli.validation.validate_user_name)
 @click.option('--vm-priority', required=False, help='VM priority',
               type=click.Choice(['dedicated', 'lowpriority']))
-@click.option('--vm-size', required=False, help='VM size for nodes',
+@click.option('--vm-size', required=True, help='VM size for nodes',
               callback=cli.validation.validate_vm_size)
 @click.pass_context
 def create_cluster(
@@ -211,8 +211,8 @@ def create_cluster(
         bfs_mount_path: str,
         bfs_name: str,
         image: str,
-        max: int,
-        min: int,
+        max_nodes: int,
+        min_nodes: int,
         password: str,
         ssh_key: str,
         storage_account_key: str,
@@ -227,8 +227,8 @@ def create_cluster(
     context.obj['bfs_mount_path'] = bfs_mount_path
     context.obj['bfs_name'] = bfs_name
     context.obj['image'] = image
-    context.obj['max'] = max
-    context.obj['min'] = min
+    context.obj['max_nodes'] = max_nodes
+    context.obj['min_nodes'] = min_nodes
     context.obj['password'] = password
     context.obj['ssh_key'] = ssh_key
     context.obj['storage_account_key'] = storage_account_key

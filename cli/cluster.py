@@ -9,61 +9,86 @@ LOGGER = logging.getLogger(__name__)
 CLUSTER_TYPE = 'cluster'
 
 def create_cluster(context):
-    AFS_URL = 'https://{}.file.core.windows.net/{}'.format(
-        context.obj['storage_account_name'],
-        context.obj['afs_name']
-    )
+    azure_file_shares, azure_blob_file_systems = None, None
 
-    params = models.ClusterCreateParameters(
+    if not (context.obj['password'] or context.obj['ssh_key']):
+        LOGGER.error('Cluster creation requires password or ssh_key')
+        return
+
+    parameters = models.ClusterCreateParameters(
         vm_size=context.obj['vm_size'],
         vm_priority=context.obj['vm_priority'],
         scale_settings=models.ScaleSettings(
-            auto=models.AutoScaleSettings(
-                minimum_node_count=context.obj[min],
-                maximum_node_count=context.obj[max]
-            )
-        ),
-        virtual_machine_configuration=models.VirtualMachineConfiguration(
-            image_reference=context.obj['image']
-        ),
-        node_setup=models.NodeSetup(
-            mount_volumes=models.MountVolumes(
-                azure_file_shares=[
-                    models.AzureFileShareReference(
-                        account_name=context.obj['storage_account_name'],
-                        azure_file_url=AFS_URL,
-                        credentials=models.AzureStorageCredentialsInfo(
-                            account_key=context.obj['storage_account_key']
-                        ),
-                        relative_mount_path=context.obj['afs_mount_path']
-                    )
-                ],
-                azure_blob_file_systems=[
-                    models.AzureBlobFileSystemReference(
-                        account_name=context.obj['storage_account_name'],
-                        container_name=context.obj['bfs_name'],
-                        credentials=models.AzureStorageCredentialsInfo(
-                            account_key=context.obj['storage_account_key']
-                        ),
-                        relative_mount_path=context.obj['bfs_mount_path']
-                    )
-                ]
+            auto_scale=models.AutoScaleSettings(
+                minimum_node_count=context.obj['min_nodes'],
+                maximum_node_count=context.obj['max_nodes']
             )
         ),
         user_account_settings=models.UserAccountSettings(
             admin_user_name=context.obj['user_name'],
             admin_user_password=context.obj['password'],
-            admin_user_ssh_public_key=context.obj['ssh_key'],
+            admin_user_ssh_public_key=context.obj['ssh_key']
         )
     )
+
+    if context.obj['image']:
+        parameters['virtual_machine_configuration'] \
+          = models.VirtualMachineConfiguration(
+              image_reference=context.obj['image']
+        )
+
+    if context.obj['afs_name']:
+        if not context.obj['storage_account_name']:
+            LOGGER.error('Use of AFS requires --storage-account-name')
+            return
+
+        afs_url = 'https://{}.file.core.windows.net/{}'.format(
+            context.obj['storage_account_name'],
+            context.obj['afs_name']
+        )
+
+        azure_file_shares = [
+            models.AzureFileShareReference(
+                account_name=context.obj['storage_account_name'],
+                azure_file_url=afs_url,
+                credentials=models.AzureStorageCredentialsInfo(
+                    account_key=context.obj['storage_account_key']
+                ),
+                relative_mount_path=context.obj['afs_mount_path']
+            )
+        ]
+
+    if context.obj['bfs_name']:
+        if not context.obj['storage_account_name']:
+            LOGGER.error('Use of BFS requires --storage-account-name')
+            return
+
+        azure_blob_file_systems = [
+            models.AzureBlobFileSystemReference(
+                account_name=context.obj['storage_account_name'],
+                container_name=context.obj['bfs_name'],
+                credentials=models.AzureStorageCredentialsInfo(
+                    account_key=context.obj['storage_account_key']
+                ),
+                relative_mount_path=context.obj['bfs_mount_path']
+            )
+        ]
+
+    if context.obj['afs_name'] or context.obj['bfs_name']:
+        parameters['node_setup'] = models.NodeSetup(
+            mount_volumes=models.MountVolumes(
+                azure_blob_file_systems=azure_blob_file_systems,
+                azure_file_shares=azure_file_shares
+            )
+        )
 
     cluster_status = context.obj['batchai_client'].clusters.create(
         context.obj['resource_group'],
         context.obj['workspace'],
         context.obj['cluster_name'],
-        params
+        parameters
     ).result()
-    print(cluster_status)
+    LOGGER.info(cluster_status)
 
 def delete_cluster(context):
     cluster_name = context.obj['cluster_name']

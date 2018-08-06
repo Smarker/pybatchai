@@ -5,7 +5,7 @@ setup(
     version='0.0.1',
     install_requires=[
         'azure',
-        'azure-mgmt >= 2.0.0',
+        'azure-mgmt >= 4.0.0',
         'azure-storage-blob ~= 1.3.0',
         'azure-storage-file ~= 1.3.0',
         'blobxfer',
