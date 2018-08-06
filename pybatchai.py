@@ -6,8 +6,13 @@ from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
 import click
 import coloredlogs
 
+<<<<<<< HEAD
 import cli.blob_storage
 import cli.cluster
+=======
+#import cli.cluster
+import cli.blob_storage
+>>>>>>> 6e5bddff3b689b782de248bd9053f6ade7dd67d8
 import cli.fileshare
 import cli.resource_group
 import cli.storage
