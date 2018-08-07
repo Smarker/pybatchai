@@ -2,7 +2,6 @@ import logging
 
 from azure.mgmt.resource import ResourceManagementClient
 from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
-
 import cli.utils
 
 LOGGER = logging.getLogger(__name__)
