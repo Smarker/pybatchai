@@ -173,36 +173,28 @@ def cluster(
 @click.option('--afs-mount-path', required=False, type=click.Path(),
               default='afs', help='mount path for azure file share')
 @click.option('--afs-name', required=False,
-              help='name of afs to be mounted on each node',
-              callback=cli.validation.validate_afs_name)
+              help='name of afs to be mounted on each node')
 @click.option('--bfs-mount-path', required=False, type=click.Path(),
               default='bfs', help='mount path for storage container')
 @click.option('--bfs-name', required=False,
-              help='name of storage container to be mounted on each node',
-              callback=cli.validation.validate_bfs_name)
-@click.option('--image', required=False, help='os image alias',
-              callback=cli.validation.validate_image_name)
+              help='name of storage container to be mounted on each node')
+@click.option('--image', required=False, help='os image alias')
 @click.option('--max-nodes', required=True, type=click.IntRange(min=0),
               help='max nodes for auto-scale cluster')
 @click.option('--min-nodes', required=True, type=click.IntRange(min=0),
               help='min nodes for auto-scale cluster')
 @click.option('--password', required=False,
-              help='optional password for admin user on each node',
-              callback=cli.validation.validate_password)
+              help='optional password for admin user on each node')
 @click.option('--ssh-key', required=False, type=click.Path(exists=True),
               help='optional path to SSH public key')
-@click.option('--storage-account-key', required=False, help='storage account key',
-              callback=cli.validation.validate_storage_key)
+@click.option('--storage-account-key', required=False, help='storage account key')
 @click.option('--storage-account-name', required=False,
-              help='storage account for azure file shares and/or azure storage containers',
-              callback=cli.validation.validate_storage_account_name)
+              help='storage account for azure file shares and/or azure storage containers')
 @click.option('--user-name', required=True,
-              help='username for admin user on each node',
-              callback=cli.validation.validate_user_name)
+              help='username for admin user on each node')
 @click.option('--vm-priority', required=False, help='VM priority',
               type=click.Choice(['dedicated', 'lowpriority']))
-@click.option('--vm-size', required=True, help='VM size for nodes',
-              callback=cli.validation.validate_vm_size)
+@click.option('--vm-size', required=True, help='VM size for nodes')
 @click.pass_context
 def create_cluster(
         context: object,

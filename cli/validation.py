@@ -35,33 +35,6 @@ def validate_fileshare_name(context, param, value):
     return regex_matches(REGEX_DICT['fileshare_name'], value,
                          'See https://docs.microsoft.com/en-us/rest/api/storageservices/Naming-and-Referencing-Shares--Directories--Files--and-Metadata?redirectedfrom=MSDN#share-names for name format')
 
-def validate_afs_name(context, param, value):
-    return value
-
-def validate_bfs_name(context, param, value):
-    return value
-
-def validate_image_name(context, param, value):
-    return value
-
-def validate_password(context, param, value):
-    return value
-
-def validate_storage_key(context, param, value):
-    return value
-
-def validate_storage_key(context, param, value):
-    return value
-
-def validate_storage_account_name(context, param, value):
-    return value
-
-def validate_user_name(context, param, value):
-    return value
-
-def validate_vm_size(context, param, value):
-    return value
-
 def validate_container_name(context, param, value):
     return regex_matches(REGEX_DICT['container_name'], value,
                          'See https://docs.microsoft.com/en-us/rest/api/storageservices/Naming-and-Referencing-Shares--Directories--Files--and-Metadata?redirectedfrom=MSDN#share-names for name format')
